@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import Square from './Square'
+import { DragDropContext } from 'react-dnd'
+import HTML5Backend from 'react-dnd-html5-backend'
+import BoardSquare from './BoardSquare'
 import Knight from './Knight'
 
+@DragDropContext(HTML5Backend)
 export default class Board extends Component {
   static propTypes = {
     knightPosition: PropTypes.arrayOf(
@@ -10,15 +13,16 @@ export default class Board extends Component {
     ).isRequired,
   }
 
+  renderPiece = (x, y) => {
+    const [knightX, knightY] = this.props.knightPosition
+    const isKnightHere = x === knightX && y === knightY
+    return isKnightHere ? <Knight /> : null
+  }
+
+
   renderSquare = (i) => {
     const x = i % 8;
     const y = Math.floor(i / 8);
-    const black = (x + y) % 2 === 1;
-
-    const [knightX, knightY] = this.props.knightPosition;
-    const piece = (x === knightX && y === knightY) ?
-      <Knight /> :
-      null;
 
     return (
       <div
@@ -28,9 +32,9 @@ export default class Board extends Component {
          height: '12.5%'
        }}
       >
-        <Square black={black}>
-          {piece}
-        </Square>
+        <BoardSquare x={x} y={y}>
+          {this.renderPiece(x, y)}
+        </BoardSquare>
       </div>
     );
   }
@@ -44,7 +48,7 @@ export default class Board extends Component {
       <div
         style={{
           width: '100%',
-          height: '300px',
+          height: '500px',
           display: 'flex',
           flexWrap: 'wrap'
         }}
